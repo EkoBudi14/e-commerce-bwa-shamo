@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shamo/models/carts_model.dart';
+import 'package:shamo/providers/carts_provider.dart';
 import 'package:shamo/theme.dart';
 
 class CartCard extends StatelessWidget {
+  final CartsModel carts;
+  CartCard({this.carts});
   @override
   Widget build(BuildContext context) {
+    CartsProvider cartProvider = Provider.of<CartsProvider>(context);
+
     return Container(
       margin: EdgeInsets.only(
         top: defaultMargin,
@@ -26,8 +33,8 @@ class CartCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   image: DecorationImage(
-                    image: AssetImage(
-                      'assets/image_shoes.png',
+                    image: NetworkImage(
+                      carts.product.galleries[0].url,
                     ),
                   ),
                 ),
@@ -40,13 +47,13 @@ class CartCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Terrex Urban low",
+                      carts.product.name,
                       style: primaryTextStyle.copyWith(
                         fontWeight: semibold,
                       ),
                     ),
                     Text(
-                      "\$143,98",
+                      "\$${carts.product.price}",
                       style: priceTextStyle,
                     )
                   ],
@@ -54,15 +61,20 @@ class CartCard extends StatelessWidget {
               ),
               Column(
                 children: [
-                  Image.asset(
-                    "assets/btn_plus.png",
-                    width: 16,
+                  GestureDetector(
+                    onTap: () {
+                      cartProvider.addQuantity(carts.id);
+                    },
+                    child: Image.asset(
+                      "assets/btn_plus.png",
+                      width: 16,
+                    ),
                   ),
                   SizedBox(
                     height: 2,
                   ),
                   Text(
-                    "2",
+                    carts.quantity.toString(),
                     style: primaryTextStyle.copyWith(
                       fontWeight: medium,
                     ),
@@ -70,9 +82,14 @@ class CartCard extends StatelessWidget {
                   SizedBox(
                     height: 2,
                   ),
-                  Image.asset(
-                    "assets/btn_min.png",
-                    width: 16,
+                  GestureDetector(
+                    onTap: () {
+                      cartProvider.reduceQuantity(carts.id);
+                    },
+                    child: Image.asset(
+                      "assets/btn_min.png",
+                      width: 16,
+                    ),
                   )
                 ],
               ),
@@ -81,23 +98,28 @@ class CartCard extends StatelessWidget {
           SizedBox(
             height: 12,
           ),
-          Row(
-            children: [
-              Image.asset(
-                "assets/icon_trash.png",
-                width: 10,
-              ),
-              SizedBox(
-                width: 5,
-              ),
-              Text(
-                "Remove",
-                style: alertTextStyle.copyWith(
-                  fontSize: 12,
-                  fontWeight: light,
+          GestureDetector(
+            onTap: () {
+              cartProvider.removeCarts(carts.id);
+            },
+            child: Row(
+              children: [
+                Image.asset(
+                  "assets/icon_trash.png",
+                  width: 10,
                 ),
-              )
-            ],
+                SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  "Remove",
+                  style: alertTextStyle.copyWith(
+                    fontSize: 12,
+                    fontWeight: light,
+                  ),
+                )
+              ],
+            ),
           )
         ],
       ),

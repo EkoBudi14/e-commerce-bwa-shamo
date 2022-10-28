@@ -1,17 +1,24 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shamo/providers/auth_provider.dart';
 import 'package:shamo/providers/product_provider.dart';
+import 'package:shamo/services/auth_service.dart';
+import 'package:shamo/services/secure_storage.dart';
 import 'package:shamo/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+String finalEmail;
+String finalPassword;
+String finalToken;
 
 class SplashPage extends StatefulWidget {
   @override
   _SplashPageState createState() => _SplashPageState();
 }
 
-String finalEmail;
 bool isAuth = false;
+AuthService authService = AuthService();
 
 class _SplashPageState extends State<SplashPage> {
   @override
@@ -24,11 +31,6 @@ class _SplashPageState extends State<SplashPage> {
     //   );
     // });
 
-    // Timer(
-    //   Duration(seconds: 3),
-    //   () => Navigator.pushNamed(
-    //       context, isAuth == true ? '/home' : '/sign-in'),
-    // );
     // _checkIfLoggedIn();
     getInit();
 
@@ -37,29 +39,26 @@ class _SplashPageState extends State<SplashPage> {
 
   getInit() async {
     await Provider.of<ProductProvider>(context, listen: false).getProducts();
-    Navigator.pushNamed(context, '/sign-in');
+    finalEmail = await SecureStorage.getEmail();
+    finalPassword = await SecureStorage.getPassword();
+    finalToken = await SecureStorage.getToken();
+
+    Timer(
+      Duration(seconds: 3),
+      () async {
+        if (finalToken != null) {
+          await Provider.of<AuthProvider>(context, listen: false).login(
+            email: finalEmail,
+            password: finalPassword,
+          );
+
+          Navigator.pushReplacementNamed(context, '/home');
+        } else {
+          Navigator.pushNamed(context, '/sign-in');
+        }
+      },
+    );
   }
-  // void _checkIfLoggedIn() async{
-  //   SharedPreferences localStorage = await SharedPreferences.getInstance();
-  //   var token = localStorage.getString('token');
-  //   if(token != null){
-  //     setState(() {
-  //       isAuth = true;
-  //     });
-  //   }
-  // }
-
-  // Future getValidationData() async {
-  //   final SharedPreferences sharedPreferences =
-  //       await SharedPreferences.getInstance();
-  //   var obtainedEmail = sharedPreferences.getString('email');
-
-  //   setState(() {
-  //     finalEmail = obtainedEmail;
-  //   });
-
-  //   print(finalEmail);
-  // }
 
   @override
   Widget build(BuildContext context) {

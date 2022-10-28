@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shamo/providers/carts_provider.dart';
 import 'package:shamo/theme.dart';
 import 'package:shamo/widget/cart_card.dart';
 
 class CartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    CartsProvider cartsProvider = Provider.of<CartsProvider>(context);
+
     Widget header() {
       return AppBar(
         backgroundColor: backgroundColor1,
         centerTitle: true,
+        automaticallyImplyLeading: false,
+        leading: new IconButton(
+          icon: new Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pushNamed(context, '/home'),
+        ),
         title: Text("Your Cart"),
         elevation: 0,
       );
@@ -76,9 +85,13 @@ class CartPage extends StatelessWidget {
         padding: EdgeInsets.symmetric(
           horizontal: defaultMargin,
         ),
-        children: [
-          CartCard(),
-        ],
+        children: cartsProvider.carts
+            .map(
+              (e) => CartCard(
+                carts: e,
+              ),
+            )
+            .toList(),
       );
     }
 
@@ -95,11 +108,11 @@ class CartPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Subtotal",
+                    "Total Item",
                     style: primaryTextStyle,
                   ),
                   Text(
-                    "\$287,96",
+                    "${cartsProvider.totalItems()}",
                     style: priceTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: semibold,
@@ -108,8 +121,26 @@ class CartPage extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(
-              height: 30,
+            Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: defaultMargin,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Subtotal",
+                    style: primaryTextStyle,
+                  ),
+                  Text(
+                    "\$${cartsProvider.totalPrice()}",
+                    style: priceTextStyle.copyWith(
+                      fontSize: 16,
+                      fontWeight: semibold,
+                    ),
+                  )
+                ],
+              ),
             ),
             Divider(
               thickness: 0.3,
@@ -162,8 +193,9 @@ class CartPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: backgroundColor3,
       appBar: header(),
-      body: content(),
-      bottomNavigationBar: customBottomNavbar(),
+      body: cartsProvider.carts.length == 0 ? emptyCart() : content(),
+      bottomNavigationBar:
+          cartsProvider.carts.length == 0 ? SizedBox() : customBottomNavbar(),
     );
   }
 }

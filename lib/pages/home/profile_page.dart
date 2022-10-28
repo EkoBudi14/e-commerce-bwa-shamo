@@ -29,10 +29,15 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Row(
               children: [
                 ClipOval(
-                  child: Image.network(
-                    "${user.profilePhotoUrl}",
-                    width: 64,
-                  ),
+                  child: (user.profilePhotoUrl == null)
+                      ? Image.network(
+                          user.profilePhotoUrl,
+                          width: 64,
+                        )
+                      : Image.asset(
+                          "assets/image_profile.png",
+                          width: 64,
+                        ),
                 ),
                 SizedBox(
                   width: 16,

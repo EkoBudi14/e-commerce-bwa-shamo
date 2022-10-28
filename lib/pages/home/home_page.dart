@@ -2,16 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shamo/models/user_model.dart';
 import 'package:shamo/providers/auth_provider.dart';
+import 'package:shamo/providers/product_provider.dart';
+import 'package:shamo/services/secure_storage.dart';
 import 'package:shamo/widget/product_card.dart';
 import 'package:shamo/widget/product_tile.dart';
 
 import '../../theme.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    ProductProvider productProvider = Provider.of<ProductProvider>(context);
+
     UserModel user = authProvider.user;
+    String saveText = '';
 
     Widget header() {
       return Container(
@@ -38,7 +48,18 @@ class HomePage extends StatelessWidget {
                     style: subtitleTextStyle.copyWith(
                       fontSize: 16,
                     ),
-                  )
+                  ),
+                  // ignore: deprecated_member_use
+                  // RaisedButton(
+                  //   onPressed: () async {
+                  //     String val = await SecureStorage.getPassword();
+                  //     print(val);
+                  //     setState(() {
+                  //       saveText = val;
+                  //     });
+                  //   },
+                  //   child: Text("Get local"),
+                  // ),
                 ],
               ),
             ),
@@ -48,7 +69,9 @@ class HomePage extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 image: DecorationImage(
-                  image: NetworkImage(user.profilePhotoUrl),
+                  image: (user.profilePhotoUrl == null)
+                      ? NetworkImage(user.profilePhotoUrl)
+                      : AssetImage("assets/image_profile.png"),
                 ),
               ),
             )
@@ -217,11 +240,11 @@ class HomePage extends StatelessWidget {
                 width: defaultMargin,
               ),
               Row(
-                children: [
-                  ProductCard(),
-                  ProductCard(),
-                  ProductCard(),
-                ],
+                children: productProvider.products
+                    .map((product) => ProductCard(
+                          product: product,
+                        ))
+                    .toList(),
               )
             ],
           ),
@@ -250,11 +273,9 @@ class HomePage extends StatelessWidget {
       return Container(
         margin: EdgeInsets.only(top: 14),
         child: Column(
-          children: [
-            ProductTile(),
-            ProductTile(),
-            ProductTile(),
-          ],
+          children: productProvider.products
+              .map((product) => ProductTile(product))
+              .toList(),
         ),
       );
     }

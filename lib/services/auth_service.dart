@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:shamo/models/user_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:shamo/services/secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  String baseUrl = 'http://10.0.2.2:8000/api';
+  String baseUrl = 'https://shamo-backend.buildwithangga.id/api';
   // String baseUrl = 'http://192.168.18.6:8000/api';
 
   // Future<String> _getTokenPreference() async {
@@ -75,6 +76,9 @@ class AuthService {
       UserModel user = UserModel.fromJson(data['user']);
       user.token = 'Bearer ' + data['access_token'];
       // prefs.setString('token', token);
+      SecureStorage.setEmail(email);
+      SecureStorage.setPassword(password);
+      SecureStorage.setToken(user.token);
 
       return user;
     } else {
