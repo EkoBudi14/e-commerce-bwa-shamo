@@ -5,6 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shamo/models/product_model.dart';
+import 'package:shamo/pages/detail_chat.dart';
 import 'package:shamo/pages/home/whistlist_page.dart';
 import 'package:shamo/providers/carts_provider.dart';
 import 'package:shamo/providers/product_provider.dart';
@@ -403,16 +404,25 @@ class _ProductPageState extends State<ProductPage> {
 
             // NOTE: BUTTONS
             Container(
+              width: double.infinity,
               margin: EdgeInsets.all(defaultMargin),
               child: Row(
                 children: [
-                  Container(
-                    width: 54,
-                    height: 54,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(
-                          'assets/btn_chat.png',
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => DetailChat(widget.product)));
+                    },
+                    child: Container(
+                      width: 54,
+                      height: 54,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage(
+                            'assets/btn_chat.png',
+                          ),
                         ),
                       ),
                     ),

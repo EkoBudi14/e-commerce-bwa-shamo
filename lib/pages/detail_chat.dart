@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shamo/models/product_model.dart';
 import 'package:shamo/theme.dart';
 import 'package:shamo/widget/chat_bubble.dart';
 
 class DetailChat extends StatelessWidget {
+  final ProductModel productModel;
+  DetailChat(this.productModel);
+
   @override
   Widget build(BuildContext context) {
     Widget header() {
@@ -66,8 +70,8 @@ class DetailChat extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                'assets/image_shoes.png',
+              child: Image.network(
+                productModel.galleries[0].url,
                 width: 54,
               ),
             ),
@@ -110,7 +114,9 @@ class DetailChat extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            productPreview(),
+            productModel is UninitializedProductModel
+                ? SizedBox()
+                : productPreview(),
             Row(
               children: [
                 Expanded(
@@ -150,27 +156,39 @@ class DetailChat extends StatelessWidget {
     }
 
     Widget content() {
-      return ListView(
-        padding: EdgeInsets.symmetric(horizontal: defaultMargin),
-        children: [
-          ChatBubble(
-            isSender: true,
-            text: "Hi, This item is still available ?",
-            hasProduct: true,
-          ),
-          ChatBubble(
-            isSender: false,
-            text: "Good night, This item is only available in size 42 and 43",
-          )
-        ],
-      );
+      return SingleChildScrollView(
+          reverse: true,
+          padding: EdgeInsets.symmetric(horizontal: defaultMargin),
+          child: Column(
+            children: [
+              ChatBubble(
+                isSender: true,
+                text: "Hi, This item is still available ?",
+                hasProduct: true,
+              ),
+              ChatBubble(
+                isSender: false,
+                text:
+                    "Good night, This item is only available in size 42 and 43",
+              )
+            ],
+          ));
     }
 
     return Scaffold(
       backgroundColor: backgroundColor3,
+      resizeToAvoidBottomInset: true,
       appBar: header(),
-      bottomNavigationBar: chatInput(),
-      body: content(),
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: chatInput(),
+      ),
+      body: SingleChildScrollView(
+        reverse: true,
+        child: content(),
+      ),
     );
   }
 }

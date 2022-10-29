@@ -53,3 +53,5 @@ class ProductModel {
     };
   }
 }
+
+class UninitializedProductModel extends ProductModel {}

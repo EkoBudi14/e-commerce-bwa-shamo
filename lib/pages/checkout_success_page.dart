@@ -8,6 +8,7 @@ class CheckoutSuccessPage extends StatelessWidget {
       return AppBar(
         backgroundColor: backgroundColor1,
         elevation: 0,
+        automaticallyImplyLeading: false,
         centerTitle: true,
         title: Text(
           "Checkout Success",
@@ -83,7 +84,7 @@ class CheckoutSuccessPage extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  "Order Other Shoes",
+                  "View My Order",
                   style: primaryTextStyle.copyWith(
                     fontSize: 16,
                     fontWeight: medium,

@@ -1,10 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shamo/providers/auth_provider.dart';
+import 'package:shamo/providers/transaction_provider.dart';
 import 'package:shamo/theme.dart';
+import 'package:shamo/widget/cart_card.dart';
 import 'package:shamo/widget/checkout_card.dart';
+
+import '../providers/carts_provider.dart';
 
 class CheckoutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    CartsProvider cartProvider = Provider.of<CartsProvider>(context);
+    TransactionProvider transactionProvider =
+        Provider.of<TransactionProvider>(context);
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+
+    handleCheckout() async {
+      if (await transactionProvider.checkout(authProvider.user.token,
+          cartProvider.carts, cartProvider.totalPrice())) {
+        cartProvider.carts = [];
+        Navigator.pushNamed(context, '/checkout-success');
+      }
+    }
+
     Widget header() {
       return AppBar(
         elevation: 0,
@@ -35,8 +54,10 @@ class CheckoutPage extends StatelessWidget {
                     fontWeight: medium,
                   ),
                 ),
-                CheckoutCard(),
-                CheckoutCard(),
+                Column(
+                  children:
+                      cartProvider.carts.map((e) => CheckoutCard(e)).toList(),
+                ),
               ],
             ),
           ),
@@ -162,7 +183,7 @@ class CheckoutPage extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "2 Items",
+                      "${cartProvider.totalItems()} Items",
                       style: primaryTextStyle.copyWith(
                         fontWeight: medium,
                       ),
@@ -182,7 +203,7 @@ class CheckoutPage extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "\$575.96",
+                      "\$${cartProvider.totalPrice()}",
                       style: primaryTextStyle.copyWith(
                         fontWeight: medium,
                       ),
@@ -229,7 +250,7 @@ class CheckoutPage extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "\$575.92",
+                      "\$${cartProvider.totalPrice()}",
                       style: priceTextStyle.copyWith(
                         fontWeight: semibold,
                       ),
@@ -254,9 +275,7 @@ class CheckoutPage extends StatelessWidget {
               vertical: defaultMargin,
             ),
             child: TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/checkout-success');
-              },
+              onPressed: handleCheckout,
               style: TextButton.styleFrom(
                 backgroundColor: primaryColor,
                 shape: RoundedRectangleBorder(
