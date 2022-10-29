@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shamo/models/message_model.dart';
+import 'package:shamo/providers/auth_provider.dart';
+import 'package:shamo/services/message_services.dart';
 import 'package:shamo/widget/chat_tile.dart';
 
 import '../../theme.dart';
@@ -6,38 +10,7 @@ import '../../theme.dart';
 class ChatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Widget header() {
-      return AppBar(
-        backgroundColor: backgroundColor1,
-        centerTitle: true,
-        title: Text(
-          "Message Support",
-          style: primaryTextStyle.copyWith(
-            fontSize: 18,
-            fontWeight: medium,
-          ),
-        ),
-        elevation: 0,
-        automaticallyImplyLeading: false,
-      );
-    }
-
-    Widget content() {
-      return Expanded(
-        child: Container(
-          width: double.infinity,
-          color: backgroundColor3,
-          child: ListView(
-            padding: EdgeInsets.symmetric(
-              horizontal: defaultMargin,
-            ),
-            children: [
-              ChatTile(),
-            ],
-          ),
-        ),
-      );
-    }
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
 
     Widget emptyChat() {
       return Expanded(
@@ -98,6 +71,48 @@ class ChatPage extends StatelessWidget {
           ),
         ),
       );
+    }
+
+    Widget header() {
+      return AppBar(
+        backgroundColor: backgroundColor1,
+        centerTitle: true,
+        title: Text(
+          "Message Support",
+          style: primaryTextStyle.copyWith(
+            fontSize: 18,
+            fontWeight: medium,
+          ),
+        ),
+        elevation: 0,
+        automaticallyImplyLeading: false,
+      );
+    }
+
+    Widget content() {
+      return StreamBuilder<List<MessageModel>>(
+          stream: MessageServices()
+              .getMessageByUserId(userId: authProvider.user.id),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Expanded(
+                child: Container(
+                  width: double.infinity,
+                  color: backgroundColor3,
+                  child: ListView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: defaultMargin,
+                    ),
+                    children: [
+                      ChatTile(),
+                    ],
+                  ),
+                ),
+              );
+            } else {
+              return emptyChat();
+            }
+          });
     }
 
     return Column(
